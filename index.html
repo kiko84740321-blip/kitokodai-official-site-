@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#050505">
+<meta name="description" content="きとこ / Kitokodai Official Site">
+<title>きとこ | OFFICIAL SITE</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Noto+Serif+JP:wght@400;500;600;700&display=swap');
+:root{--bg:#050505;--ink:#f2efed;--red:#b10d2e;--muted:#a6a0a0;--line:#38252a}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:85px}body{margin:0;background:var(--bg);color:var(--ink);font-family:'Noto Serif JP',serif;line-height:1.8}a{color:inherit;text-decoration:none}button{font:inherit}
+header{height:76px;position:fixed;z-index:10;inset:0 0 auto;display:flex;align-items:center;justify-content:space-between;padding:0 5vw;background:#050505df;backdrop-filter:blur(12px);border-bottom:1px solid #ffffff13}
+.brand{font-family:'Cormorant Garamond',serif;letter-spacing:.2em;font-size:1.15rem}.brand em{font-style:normal;color:#c31539}
+nav{display:flex;gap:30px;font-size:.68rem;letter-spacing:.15em}nav a:hover{color:#df3151}.menu{display:none;background:none;border:1px solid var(--line);color:white;padding:6px 10px}
+.hero{min-height:100svh;position:relative;display:grid;place-items:center;overflow:hidden;padding:130px 6vw 80px;background:radial-gradient(ellipse at 50% 48%,#21050b 0,#090607 36%,#050505 68%)}
+.hero:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(135deg,transparent 0 110px,#ffffff06 111px,#ffffff06 112px,transparent 113px 220px);mask-image:linear-gradient(90deg,transparent,#000 45%,#000 80%,transparent)}
+.hero-inner{width:min(1160px,100%);display:grid;grid-template-columns:1fr .9fr;align-items:center;gap:5vw;position:relative;z-index:1}
+.eyebrow,.kicker{font-size:.68rem;letter-spacing:.32em;color:#d52b4d;text-transform:uppercase}
+h1{font-size:clamp(4rem,9vw,8rem);line-height:1.05;font-weight:500;letter-spacing:.12em;margin:25px 0 14px}
+.sub{font-family:'Cormorant Garamond',serif;letter-spacing:.27em;color:#c8b9bc;font-size:1rem}
+.hero p{color:#c3b8ba;max-width:480px;font-size:.9rem}
+.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}.btn{border:1px solid #8d1730;padding:11px 20px;font-size:.7rem;letter-spacing:.16em;display:inline-block;transition:.2s}.btn.primary{background:#9d0c29}.btn:hover{background:#d02043;border-color:#d02043;transform:translateY(-2px)}
+.logo-stage{min-height:400px;display:grid;place-items:center;position:relative}
+.logo-stage:after{content:"KITOKODAI / MUSIC & STORY";position:absolute;bottom:0;right:0;writing-mode:vertical-rl;letter-spacing:.25em;font-size:.57rem;color:#a88a91}
+.logo-stage img{width:min(100%,490px);height:auto;display:block;filter:drop-shadow(0 0 24px #7c001d38)}
+section{padding:100px 6vw}.wrap{width:min(1120px,100%);margin:auto}.head{display:flex;justify-content:space-between;align-items:end;gap:20px;border-bottom:1px solid var(--line);padding-bottom:18px;margin-bottom:34px}h2{font-size:clamp(1.8rem,4vw,2.8rem);font-weight:500;letter-spacing:.12em;margin:5px 0 0}.desc{font-size:.75rem;color:var(--muted);max-width:330px}
+.featured{background:linear-gradient(180deg,#090708,#10070a)}.feature-card{display:grid;grid-template-columns:1.1fr .9fr;min-height:330px;border:1px solid #4b202a;background:#0b090a}
+.feature-art{position:relative;min-height:300px;display:grid;place-items:center;overflow:hidden;background:radial-gradient(ellipse at center,#4c0719,#14070b 45%,#080708 78%)}
+.feature-art:before{content:"";position:absolute;width:60%;aspect-ratio:1;border:1px solid #c6294b77;border-radius:50%;box-shadow:0 0 0 20px #b20d2d0a,0 0 0 60px #b20d2d08}
+.feature-art:after{content:"✳";position:absolute;font-size:clamp(9rem,20vw,16rem);color:#d02a4b26}
+.feature-art span{z-index:1;font-family:'Cormorant Garamond',serif;font-size:clamp(2.4rem,5vw,4.5rem);text-align:center;line-height:1.05;letter-spacing:.06em;text-shadow:0 2px 20px #000}
+.feature-info{padding:clamp(24px,4vw,50px);display:flex;flex-direction:column;justify-content:center;align-items:flex-start}.label{font-size:.63rem;letter-spacing:.2em;color:#d52b4d}.feature-info h3{font-size:clamp(1.4rem,3vw,2.3rem);font-weight:500;margin:12px 0}.feature-info p{font-size:.82rem;color:#bdb2b4}.edit-note{font-size:.62rem!important;color:#8f7c81!important;margin-top:18px}
+.latest-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.song{border:1px solid #302026;background:#0d0b0c;transition:.25s}.song:hover{transform:translateY(-4px);border-color:#a51a38}.art{aspect-ratio:1.15;display:grid;place-items:center;position:relative;overflow:hidden;background:radial-gradient(circle at 50% 45%,#4a0c1d,#14090c 55%,#080708)}.art:before{content:"";position:absolute;width:56%;aspect-ratio:1;border:1px solid #d52b4d88;transform:rotate(45deg);box-shadow:0 0 0 20px #d52b4d0c,0 0 0 45px #d52b4d08}.art span{position:relative;font-family:'Cormorant Garamond',serif;font-size:clamp(1.3rem,2.6vw,2.3rem);text-align:center;text-shadow:0 2px 20px #000}.song-info{padding:18px}.song-info small{color:#d52b4d;font-size:.6rem;letter-spacing:.17em}.song-info h3{font-weight:500;font-size:1.05rem;margin:6px 0}.song-info p{color:var(--muted);font-size:.73rem;min-height:3em}.textlink{font-size:.68rem;letter-spacing:.12em;border-bottom:1px solid #a51a38;padding-bottom:3px}
+.about{background:#090708}.about-grid{display:grid;grid-template-columns:.8fr 1.2fr;gap:8vw;align-items:center}.monogram{min-height:320px;display:grid;place-items:center;position:relative;border:1px solid #38252a;background:repeating-linear-gradient(135deg,#100a0c 0 22px,#0a0809 23px 44px);overflow:hidden}.monogram img{width:85%;position:relative;z-index:1;filter:drop-shadow(0 0 20px #6f071c44)}.about-copy p{font-size:.87rem;color:#c2b6b8}.about-copy .lead{font-size:1.15rem;color:white}.tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}.tags span{border:1px solid var(--line);padding:4px 10px;font-size:.63rem;letter-spacing:.1em;color:#d8c2c7}
+.social{background:#10080b}.social-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.social a{padding:22px;border:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;font-size:.8rem;transition:.2s}.social a:hover{border-color:#b10d2e;background:#19090e}.social a span{font-family:'Cormorant Garamond',serif;color:#d52b4d}
+footer{border-top:1px solid var(--line);padding:25px 6vw;display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap;font-size:.62rem;color:#8c7d81;letter-spacing:.12em}
+.reveal{opacity:0;transform:translateY(16px);transition:.65s}.reveal.on{opacity:1;transform:none}
+@media(max-width:740px){header{height:66px}.menu{display:block}nav{display:none;position:absolute;top:66px;left:0;right:0;padding:20px 6vw;background:#080708;flex-direction:column;gap:18px;border-bottom:1px solid var(--line)}nav.open{display:flex}.hero-inner{grid-template-columns:1fr}.logo-stage{grid-row:1;min-height:250px}.logo-stage img{width:min(78%,350px)}.hero{padding-top:100px}.feature-card{grid-template-columns:1fr}.feature-art{min-height:230px}.latest-grid{grid-template-columns:1fr}.song{display:grid;grid-template-columns:.8fr 1fr}.art{height:100%;aspect-ratio:auto;min-height:180px}.song-info{padding:14px}.about-grid{grid-template-columns:1fr}.monogram{min-height:240px}.social-grid{grid-template-columns:repeat(2,1fr)}section{padding:72px 6vw}.head{align-items:start;flex-direction:column}.desc{max-width:none}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.reveal{opacity:1;transform:none;transition:none}*{transition:none!important}}
+</style>
+</head>
+<body>
+<header><a class="brand" href="#top">KITO<em>KODAI</em></a><button class="menu" id="menu" aria-expanded="false">MENU</button><nav id="nav"><a href="#featured">PICK UP</a><a href="#music">MUSIC</a><a href="#about">ABOUT</a><a href="#links">LINKS</a></nav></header>
+<main>
+<section class="hero" id="top"><div class="hero-inner"><div class="reveal"><div class="eyebrow">VOCALOID PRODUCER / SINGER-SONGWRITER</div><h1>きとこ</h1><div class="sub">KITOKODAI — OFFICIAL SITE</div><p>かわいいだけじゃ、終われない。<br>音楽と物語のあいだで、心に残る一瞬を。</p><div class="actions"><a class="btn primary" href="#featured">PICK UP ↗</a><a class="btn" href="https://lit.link/Kitokodai" target="_blank" rel="noopener">OFFICIAL LINKS ↗</a></div></div><div class="logo-stage reveal"><img src="assets/kitoko-logo.jpg" alt="きとこのロゴ"></div></div></section>
+<section class="featured" id="featured"><div class="wrap"><div class="head reveal"><div><div class="kicker">01 — EDITOR'S PICK</div><h2>RECOMMEND</h2></div><p class="desc">いま、いちばん聴いてほしい一曲。</p></div><div class="feature-card reveal"><div class="feature-art"><span id="pick-art">FEATURED<br>TRACK</span></div><div class="feature-info"><div class="label" id="pick-label">KITOKODAI / PICK UP</div><h3 id="pick-title">おすすめの一曲</h3><p id="pick-description">ここにおすすめ曲の紹介文を入れられます。</p><a class="btn primary" id="pick-link" href="https://www.youtube.com/" target="_blank" rel="noopener">LISTEN / WATCH ↗</a><p class="edit-note">この枠は config.js でいつでも編集できます。</p></div></div></div></section>
+<section id="music"><div class="wrap"><div class="head reveal"><div><div class="kicker">02 — LATEST RELEASES</div><h2>最新リリース</h2></div><p class="desc">新しい作品から3曲を表示。</p></div><div class="latest-grid" id="latest"><article class="song"><div class="art"><span>しにがみ<br>ダンス！</span></div><div class="song-info"><small>VOCALOID / ORIGINAL</small><h3>しにがみダンス！</h3><p>かわいい狂気が踊りだすポップナンバー。</p><a class="textlink" href="https://www.youtube.com/" target="_blank">WATCH ↗</a></div></article><article class="song"><div class="art"><span>薔薇色の<br>シンデレラ</span></div><div class="song-info"><small>VOCALOID / ORIGINAL</small><h3>薔薇色のシンデレラ</h3><p>甘さと棘が交差する物語。</p><a class="textlink" href="https://www.youtube.com/" target="_blank">WATCH ↗</a></div></article><article class="song"><div class="art"><span>鈍色と雨</span></div><div class="song-info"><small>ORIGINAL SONG</small><h3>鈍色と雨</h3><p>雨の向こうで、ふたりで生きていくための歌。</p><a class="textlink" href="https://www.youtube.com/" target="_blank">WATCH ↗</a></div></article></div><p style="font-size:.65rem;color:#88797d;margin-top:18px">※ YouTube・Apple Musicの情報を定期取得し、重複をまとめて新しい順に表示します。</p></div></section>
+<section class="about" id="about"><div class="wrap about-grid"><div class="monogram reveal"><img src="assets/kitoko-logo.jpg" alt=""></div><div class="about-copy reveal"><div class="kicker">03 — ABOUT</div><h2>音楽で、物語をつくる。</h2><p class="lead">きとこ / Kitokodai</p><p>ボーカロイド楽曲を中心に、ポップさの中に潜む狂気や、胸の奥に残る感情を音にする音楽クリエイター。</p><p>一度聴いたら忘れられないメロディと、楽曲ごとに変わる物語を目指して制作中。</p><div class="tags"><span>VOCALOID</span><span>POP</span><span>DARK</span><span>STORYTELLING</span></div></div></div></section>
+<section class="social" id="links"><div class="wrap"><div class="head reveal"><div><div class="kicker">04 — FOLLOW</div><h2>FOLLOW / LINKS</h2></div><p class="desc">新しい作品や制作の気配はこちらから。</p></div><div class="social-grid reveal"><a href="https://lit.link/Kitokodai" target="_blank" rel="noopener">Official Links <span>↗</span></a><a href="https://youtube.com/@kitokodai" target="_blank" rel="noopener">YouTube <span>↗</span></a><a href="https://www.instagram.com/" target="_blank" rel="noopener">Instagram <span>↗</span></a><a href="https://www.tiktok.com/" target="_blank" rel="noopener">TikTok <span>↗</span></a></div></div></section>
+</main><footer><span>© <span id="year"></span> KITOKODAI</span><span>MUSIC / SHADOW / STORY</span></footer>
+<script src="config.js"></script>
+<script>
+const cfg=window.KITOKO_CONFIG||{};
+if(cfg.featured){const f=cfg.featured;document.getElementById('pick-title').textContent=f.title||'';document.getElementById('pick-label').textContent=f.label||'KITOKODAI / PICK UP';document.getElementById('pick-description').textContent=f.description||'';document.getElementById('pick-link').href=f.url||'#music';document.getElementById('pick-art').textContent=f.artText||f.title||'FEATURED TRACK';}
+async function renderLatest(){
+  const target=document.getElementById('latest');
+  try{
+    const response=await fetch('data/releases.json?ts='+Date.now(),{cache:'no-store'});
+    if(!response.ok) throw new Error('release data unavailable');
+    const data=await response.json();
+    const list=(data.items||[]).sort((a,b)=>(b.date||'').localeCompare(a.date||'')).slice(0,3);
+    if(!list.length) throw new Error('no release data yet');
+    target.replaceChildren();
+    for(const s of list){
+      const article=document.createElement('article');article.className='song';
+      const art=document.createElement('div');art.className='art';
+      if(s.artwork){const img=document.createElement('img');img.src=s.artwork;img.alt='';img.loading='lazy';img.style.cssText='width:100%;height:100%;object-fit:cover;position:absolute;inset:0';art.appendChild(img);}
+      const artText=document.createElement('span');artText.textContent=s.title||'';art.appendChild(artText);
+      const info=document.createElement('div');info.className='song-info';
+      const label=document.createElement('small');label.textContent=s.label||s.source||'ORIGINAL SONG';
+      const title=document.createElement('h3');title.textContent=s.title||'';
+      const desc=document.createElement('p');desc.textContent=s.description||'';
+      const link=document.createElement('a');link.className='textlink';link.href=s.url||'#';link.target='_blank';link.rel='noopener';link.textContent='LISTEN / WATCH ↗';
+      info.append(label,title,desc,link);
+      if(Array.isArray(s.platforms)){for(const platform of s.platforms){const a=document.createElement('a');a.className='textlink';a.style.marginLeft='12px';a.href=platform.url;a.target='_blank';a.rel='noopener';a.textContent=platform.name+' ↗';info.appendChild(a);}}
+      article.append(art,info);target.appendChild(article);
+    }
+    const note=document.querySelector('[data-release-note]');if(note)note.textContent='自動更新：'+(data.updatedAt?new Date(data.updatedAt).toLocaleString('ja-JP'):'更新待ち')+' ／ YouTube・Apple Music';
+  }catch(error){
+    console.warn('Latest releases could not be loaded; showing setup note.',error);
+    target.innerHTML='<p style="color:#bdb2b4">自動更新データはまだありません。GitHub Actions の初回実行後に最新リリースが表示されます。</p>';
+  }
+}
+renderLatest();
+document.getElementById('year').textContent=new Date().getFullYear();const menu=document.getElementById('menu'),nav=document.getElementById('nav');menu.addEventListener('click',()=>{let o=nav.classList.toggle('open');menu.setAttribute('aria-expanded',String(o));});nav.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>nav.classList.remove('open')));const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('on');io.unobserve(e.target)}}),{threshold:.1});document.querySelectorAll('.reveal').forEach(e=>io.observe(e));
+</script>
+</body></html>
