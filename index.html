@@ -521,41 +521,86 @@ const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{
   
 document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));  
   
-const trackGrid=document.querySelector(".track-grid");  
-  
-fetch("./videos.json")  
-  .then(response=>{  
-    if(!response.ok){  
-      throw new Error("videos.json の読み込みに失敗");  
-    }  
-    return response.json();  
-  })  
-  .then(videos=>{  
-    trackGrid.innerHTML="";  
-  
-    videos.slice(0,3).forEach(video=>{  
-      const article=document.createElement("article");  
-      article.className="track reveal visible";  
-  
-      article.innerHTML=`  
-        <a href="${video.url}" target="_blank" rel="noopener">  
-          <div class="cover auto-cover">  
-            <img src="${video.thumbnail}" alt="">  
-          </div>  
-          <div class="track-body">  
-            <div class="track-type">VOCALOID / ORIGINAL</div>  
-            <h3>${video.title}</h3>  
-            <p>きとこのオリジナル楽曲</p>  
-            <span class="text-link">WATCH MV ↗</span>  
-          </div>  
-        </a>  
-      `;  
-  
-      trackGrid.appendChild(article);  
-    });  
-  })  
-  .catch(error=>{  
-    console.error("YouTube動画の読み込みエラー:",error);  
-  });  
+ 
+const youtubeGrid = document.getElementById("youtube-grid");
+
+// Google Cloudで取得したYouTube Data APIキーを入れる
+const API_KEY = "ここにAPIキー";
+
+// チャンネルの最新動画3本を取得
+async function loadLatestVideos() {
+  try {
+    const channelRes = await fetch(
+      `https://www.googleapis.com/youtube/v3/channels?part=contentDetails&forHandle=%40kitokodai&key=${API_KEY}`
+    );
+
+    if (!channelRes.ok) throw new Error("チャンネル取得エラー");
+
+    const channelData = await channelRes.json();
+    const uploadsId =
+      channelData.items?.[0]?.contentDetails?.relatedPlaylists?.uploads;
+
+    if (!uploadsId) throw new Error("チャンネルが見つかりません");
+
+    const videosRes = await fetch(
+      `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${uploadsId}&maxResults=3&key=${API_KEY}`
+    );
+
+    if (!videosRes.ok) throw new Error("動画取得エラー");
+
+    const data = await videosRes.json();
+    youtubeGrid.innerHTML = "";
+
+    data.items.forEach(item => {
+      const videoId = item.snippet.resourceId.videoId;
+      const title = item.snippet.title;
+      const thumbnail =
+        item.snippet.thumbnails.high?.url ||
+        item.snippet.thumbnails.medium?.url;
+
+      const article = document.createElement("article");
+      article.className = "track";
+
+      const link = document.createElement("a");
+      link.href = `https://www.youtube.com/watch?v=${videoId}`;
+      link.target = "_blank";
+      link.rel = "noopener";
+
+      const cover = document.createElement("div");
+      cover.className = "cover auto-cover";
+
+      const img = document.createElement("img");
+      img.src = thumbnail;
+      img.alt = "";
+      cover.appendChild(img);
+
+      const body = document.createElement("div");
+      body.className = "track-body";
+
+      const type = document.createElement("div");
+      type.className = "track-type";
+      type.textContent = "YOUTUBE / LATEST VIDEO";
+
+      const heading = document.createElement("h3");
+      heading.textContent = title;
+
+      const label = document.createElement("span");
+      label.className = "text-link";
+      label.textContent = "WATCH VIDEO ↗";
+
+      body.append(type, heading, label);
+      link.append(cover, body);
+      article.appendChild(link);
+      youtubeGrid.appendChild(article);
+    });
+  } catch (error) {
+    console.error(error);
+    youtubeGrid.textContent =
+      "動画を読み込めませんでした。APIキーと設定を確認してください。";
+  }
+}
+
+loadLatestVideos();
+
 </script>  </body>  
 </html>
