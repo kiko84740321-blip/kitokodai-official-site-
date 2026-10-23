@@ -101,7 +101,7 @@ jobs:
           print(f"{len(videos)}件の動画を保存しました。")
           PY
 
-      - name: Save changes
+       - name: Save changes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
