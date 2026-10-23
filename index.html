@@ -167,9 +167,32 @@ h2{font-size:clamp(1.7rem,4vw,3rem);font-weight:500;letter-spacing:.1em;margin:6
 }
 
 .about-grid{display:grid;grid-template-columns:.75fr 1.25fr;gap:8vw;align-items:center}
-.about-emblem{min-height:340px;display:grid;place-items:center;background:linear-gradient(135deg,#150a0d,#080708);border:1px solid var(--line);position:relative;overflow:hidden}
-.about-emblem:before{content:"K";font-family:'Cormorant Garamond',serif;font-size:clamp(9rem,20vw,16rem);line-height:1;color:rgba(171,17,47,.28)}
-.about-emblem:after{content:"MUSIC / STORY / EMOTION";position:absolute;bottom:18px;left:20px;font-size:.6rem;letter-spacing:.2em;color:#bd8c96}
+.about-emblem{
+  min-height:340px;
+  display:grid;
+  place-items:center;
+  background:
+    linear-gradient(rgba(9,8,9,.15),rgba(9,8,9,.4)),
+    url("emotion-k.jpg") center 42% / cover no-repeat;
+  border:1px solid var(--line);
+  position:relative;
+  overflow:hidden;
+}
+
+.about-emblem:before{
+  content:none;
+}
+
+.about-emblem:after{
+  content:"MUSIC / STORY / EMOTION";
+  position:absolute;
+  bottom:18px;
+  left:20px;
+  font-size:.6rem;
+  letter-spacing:.2em;
+  color:#eee5df;
+  text-shadow:0 1px 8px #000;
+}
 .about-copy p{color:#c6b9bb;font-size:.9rem}
 .about-copy .lead{font-size:1.15rem;color:var(--cream)}
 .tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:25px}
