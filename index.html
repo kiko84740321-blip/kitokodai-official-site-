@@ -19,7 +19,17 @@ button,a{-webkit-tap-highlight-color:transparent}
 ::selection{background:var(--red);color:#fff}
 
 .nav{position:fixed;z-index:10;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:18px 5vw;background:linear-gradient(180deg,rgba(9,8,9,.96),rgba(9,8,9,.66));backdrop-filter:blur(12px);border-bottom:1px solid rgba(162,14,43,.25)}
-.logo{font-family:'Cormorant Garamond',serif;letter-spacing:.18em;font-size:1.15rem}
+.logo{
+  display:flex;
+  align-items:center;
+}
+
+.logo img{
+  display:block;
+  width:150px;
+  max-width:40vw;
+  height:auto;
+}
 .logo span{color:var(--red2)}
 .navlinks{display:flex;gap:clamp(14px,3vw,38px);font-size:.7rem;letter-spacing:.12em;color:#d6c9ca}
 .navlinks a{transition:color .2s}
@@ -257,7 +267,9 @@ footer{padding:28px 6vw;border-top:1px solid var(--line);display:flex;justify-co
 
 <body>
 <header class="nav">
-  <a class="logo" href="#top">KITOKO<span>DAI</span></a>
+<a class="logo" href="#top" aria-label="きとこ ホーム">
+  <img src="kitoko-logo.jpg" alt="きとこ">
+</a>
   <button class="menu" id="menu" aria-label="メニューを開く" aria-expanded="false">MENU</button>
   <nav class="navlinks" id="navlinks" aria-label="メインメニュー">
     <a href="#music">MUSIC</a>
