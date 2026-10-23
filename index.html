@@ -34,7 +34,15 @@ button,a{-webkit-tap-highlight-color:transparent}
 .navlinks{display:flex;gap:clamp(14px,3vw,38px);font-size:.7rem;letter-spacing:.12em;color:#d6c9ca}
 .navlinks a{transition:color .2s}
 .navlinks a:hover{color:var(--red2)}
-.menu{display:none;background:none;border:1px solid var(--line);color:var(--cream);padding:6px 10px}
+.menu{
+  display:none;
+  background:transparent;
+  border:1px solid var(--line);
+  color:var(--cream);
+  padding:4px 8px;
+  font-size:.7rem;
+  letter-spacing:.08em;
+}
 
 .hero{min-height:100svh;position:relative;display:grid;place-items:center;overflow:hidden;padding:120px 6vw 80px;background:radial-gradient(ellipse at 72% 48%,rgba(112,0,25,.28),transparent 42%),linear-gradient(120deg,#090809 35%,#160a0e 100%)}
 .hero:before{content:"";position:absolute;width:min(75vw,780px);aspect-ratio:1;border:1px solid rgba(190,30,61,.24);border-radius:50%;right:-10%;top:14%;box-shadow:0 0 0 45px rgba(190,30,61,.025),0 0 0 100px rgba(190,30,61,.02)}
@@ -290,8 +298,7 @@ footer{padding:28px 6vw;border-top:1px solid var(--line);display:flex;justify-co
 
 <body>
 <header class="nav">
-<a class="logo" href="#top" aria-label="きとこ ホーム">
-  <img src="kitoko-logo.jpg" alt="きとこ">
+
 </a>
   <button class="menu" id="menu" aria-label="メニューを開く" aria-expanded="false">MENU</button>
   <nav class="navlinks" id="navlinks" aria-label="メインメニュー">
