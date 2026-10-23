@@ -106,14 +106,20 @@ jobs:
           print(f"{len(videos[:10])}本の動画を取得しました")
           PY
 
+
       - name: Commit updated videos.json
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
           git add videos.json
+
           if git diff --cached --quiet; then
             echo "動画情報に変更はありません"
-          else
-            git commit -m "Update YouTube videos"
-            git push
+            exit 0
           fi
+
+          git commit -m "Update YouTube videos"
+
+          git pull --rebase origin main
+          git push origin main
