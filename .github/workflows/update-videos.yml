@@ -25,6 +25,7 @@ jobs:
       - name: Fetch YouTube videos
         env:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          YOUTUBE_PLAYLIST_ID: PLpSvmeL1f95wgDv-wDC9G1w_axX6ab3f4
         run: |
           python - <<'PY'
           import json
@@ -33,6 +34,7 @@ jobs:
           import urllib.request
 
           key = os.environ["YOUTUBE_API_KEY"]
+          playlist_id = os.environ["YOUTUBE_PLAYLIST_ID"]
 
           def api(endpoint, params):
               params["key"] = key
@@ -44,57 +46,64 @@ jobs:
               with urllib.request.urlopen(url, timeout=30) as response:
                   return json.load(response)
 
-          channel = api("channels", {
-              "part": "contentDetails",
-              "forHandle": "kitokodai"
-          })
-
-          items = channel.get("items", [])
-          if not items:
-              raise RuntimeError("YouTubeチャンネルが見つかりません")
-
-          uploads = items[0]["contentDetails"]["relatedPlaylists"]["uploads"]
-
-          playlist = api("playlistItems", {
-              "part": "snippet,contentDetails",
-              "playlistId": uploads,
-              "maxResults": 10
-          })
-
           videos = []
-          for item in playlist.get("items", []):
-              snippet = item["snippet"]
-              video_id = item["contentDetails"].get("videoId")
-              if not video_id:
-                  continue
+          page_token = None
 
-              thumbnails = snippet.get("thumbnails", {})
-              thumbnail = (
-                  thumbnails.get("maxres")
-                  or thumbnails.get("standard")
-                  or thumbnails.get("high")
-                  or thumbnails.get("medium")
-                  or thumbnails.get("default")
-                  or {}
-              ).get("url", f"https://i.ytimg.com/vi/{video_id}/hqdefault.jpg")
+          for _ in range(2):
+              params = {
+                  "part": "snippet,contentDetails",
+                  "playlistId": playlist_id,
+                  "maxResults": 50
+              }
+              if page_token:
+                  params["pageToken"] = page_token
 
-              videos.append({
-                  "id": video_id,
-                  "title": snippet["title"],
-                  "url": f"https://www.youtube.com/watch?v={video_id}",
-                  "thumbnail": thumbnail,
-                  "published": item["contentDetails"].get(
-                      "videoPublishedAt", snippet.get("publishedAt", "")
+              data = api("playlistItems", params)
+
+              for item in data.get("items", []):
+                  snippet = item["snippet"]
+                  video_id = item["contentDetails"].get("videoId")
+                  if not video_id:
+                      continue
+
+                  thumbnails = snippet.get("thumbnails", {})
+                  thumbnail = (
+                      thumbnails.get("maxres")
+                      or thumbnails.get("standard")
+                      or thumbnails.get("high")
+                      or thumbnails.get("medium")
+                      or thumbnails.get("default")
+                      or {}
+                  ).get(
+                      "url",
+                      f"https://i.ytimg.com/vi/{video_id}/hqdefault.jpg"
                   )
-              })
 
-          videos.sort(key=lambda video: video["published"], reverse=True)
+                  videos.append({
+                      "id": video_id,
+                      "title": snippet["title"],
+                      "url": f"https://www.youtube.com/watch?v={video_id}",
+                      "thumbnail": thumbnail,
+                      "published": item["contentDetails"].get(
+                          "videoPublishedAt",
+                          snippet.get("publishedAt", "")
+                      )
+                  })
+
+              page_token = data.get("nextPageToken")
+              if not page_token:
+                  break
+
+          videos.sort(
+              key=lambda video: video["published"],
+              reverse=True
+          )
 
           with open("videos.json", "w", encoding="utf-8") as file:
               json.dump(videos[:10], file, ensure_ascii=False, indent=2)
               file.write("\n")
 
-          print(f"{min(len(videos), 10)}本の動画を取得しました")
+          print(f"{len(videos[:10])}本の動画を取得しました")
           PY
 
       - name: Commit updated videos.json
