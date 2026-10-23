@@ -222,7 +222,10 @@ footer{padding:28px 6vw;border-top:1px solid var(--line);display:flex;justify-co
 
 /* スマホ表示 */
 @media(max-width:760px){
-  .nav{padding:14px 5vw}
+.nav{
+  padding:10px 5vw;
+  justify-content:flex-end;
+}
   .menu{display:block}
   .navlinks{display:none;position:absolute;top:100%;left:0;right:0;background:#0c090b;padding:18px 5vw 24px;flex-direction:column;border-bottom:1px solid var(--line)}
   .navlinks.open{display:flex}
