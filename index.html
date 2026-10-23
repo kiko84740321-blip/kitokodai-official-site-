@@ -46,7 +46,21 @@ section{padding:110px 6vw}
 h2{font-size:clamp(1.7rem,4vw,3rem);font-weight:500;letter-spacing:.1em;margin:6px 0 0}
 .section-desc{font-size:.78rem;color:var(--muted);max-width:300px}
 .music{background:linear-gradient(180deg,#0b090a,#10090c)}
-.track-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.track {
+  display: grid;
+  grid-template-columns: 1fr;
+  width: 100%;
+}
+
+.track-body {
+  width: 100%;
+  min-width: 0;
+}
+
+.track-body h3 {
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
 .track{background:var(--panel);border:1px solid #2b1a20;transition:transform .25s,border-color .25s}
 .track:hover{transform:translateY(-5px);border-color:var(--red)}
 .cover{aspect-ratio:1.2;position:relative;overflow:hidden;display:grid;place-items:center;background:radial-gradient(circle at 60% 40%,#54101f 0,#200b11 35%,#0a090a 72%)}
