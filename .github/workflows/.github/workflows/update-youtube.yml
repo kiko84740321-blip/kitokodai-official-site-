@@ -1,0 +1,130 @@
+
+name: Update YouTube videos
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 */6 * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-youtube-videos
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Fetch playlist videos
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          YOUTUBE_PLAYLIST_ID: PLpSvmeL1f95wgDv-wDC9G1w_axX6ab3f4
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import urllib.parse
+          import urllib.request
+
+          key = os.environ.get("YOUTUBE_API_KEY")
+          playlist_id = os.environ["YOUTUBE_PLAYLIST_ID"]
+
+          if not key:
+              raise SystemExit("YOUTUBE_API_KEY secret が設定されていません")
+
+          videos = []
+          page_token = None
+
+          for _ in range(2):
+              params = {
+                  "part": "snippet,contentDetails",
+                  "playlistId": playlist_id,
+                  "maxResults": 50,
+                  "key": key
+              }
+              if page_token:
+                  params["pageToken"] = page_token
+
+              url = (
+                  "https://www.googleapis.com/youtube/v3/playlistItems?"
+                  + urllib.parse.urlencode(params)
+              )
+
+              try:
+                  with urllib.request.urlopen(url, timeout=30) as response:
+                      data = json.load(response)
+              except Exception as e:
+                  raise SystemExit(f"YouTube API取得失敗: {e}")
+
+              for item in data.get("items", []):
+                  snippet = item["snippet"]
+                  video_id = item.get("contentDetails", {}).get("videoId")
+                  if not video_id:
+                      continue
+
+                  thumbs = snippet.get("thumbnails", {})
+                  thumbnail = (
+                      thumbs.get("maxres")
+                      or thumbs.get("standard")
+                      or thumbs.get("high")
+                      or thumbs.get("medium")
+                      or thumbs.get("default")
+                      or {}
+                  ).get(
+                      "url",
+                      f"https://i.ytimg.com/vi/{video_id}/hqdefault.jpg"
+                  )
+
+                  videos.append({
+                      "id": video_id,
+                      "title": snippet["title"],
+                      "url": f"https://www.youtube.com/watch?v={video_id}",
+                      "thumbnail": thumbnail,
+                      "published": item["contentDetails"].get(
+                          "videoPublishedAt",
+                          snippet.get("publishedAt", "")
+                      )
+                  })
+
+              page_token = data.get("nextPageToken")
+              if not page_token:
+                  break
+
+          videos.sort(key=lambda v: v["published"], reverse=True)
+
+          if not videos:
+              raise SystemExit("動画が0本でした。既存データは更新しません")
+
+          with open("/tmp/videos.json", "w", encoding="utf-8") as f:
+              json.dump(videos[:10], f, ensure_ascii=False, indent=2)
+              f.write("\n")
+
+          print(f"{min(len(videos), 10)}本の動画を取得しました")
+          PY
+
+      - name: Save latest videos
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git fetch origin main
+          git reset --hard origin/main
+
+          cp /tmp/videos.json videos.json
+          git add videos.json
+
+          if git diff --cached --quiet; then
+            echo "動画情報に変更はありません"
+            exit 0
+          fi
+
+          git commit -m "Update YouTube videos"
+          git push origin HEAD:main
