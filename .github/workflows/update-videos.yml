@@ -1,35 +1,157 @@
-name: Update latest music videos
 
-on:
-  workflow_dispatch:
-  schedule:
-    - cron: "17 */6 * * *"
+import json
+import os
+import re
+import urllib.parse
+import urllib.request
+from datetime import datetime, timezone
 
-permissions:
-  contents: write
+API_KEY = os.environ["YOUTUBE_API_KEY"]
 
-jobs:
-  update-videos:
-    runs-on: ubuntu-latest
+# これまで使っているプレイリストID
+PLAYLIST_ID = "PLpSvmeL1f95wgDv-wDC9G1w_axX6ab3f4"
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+OUTPUT_FILE = "videos.json"
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
+# 以前確認したショート動画を除外
+EXCLUDED_IDS = {
+    "rOtlMav7Myk",
+    "obh5l_fZ94w",
+    "AukutTlJ-Fs",
+}
 
-      - name: Generate videos.json
-        env:
-          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
-        run: python scripts/update_videos.py
+def api_get(endpoint, params):
+    params["key"] = API_KEY
+    url = (
+        "https://www.googleapis.com/youtube/v3/"
+        + endpoint
+        + "?"
+        + urllib.parse.urlencode(params)
+    )
+    with urllib.request.urlopen(url, timeout=30) as response:
+        return json.load(response)
 
-      - name: Commit updated videos.json
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add videos.json
-          git diff --cached --quiet || git commit -m "Update latest music videos"
-          git push
+def parse_duration(value):
+    match = re.fullmatch(
+        r"PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?",
+        value
+    )
+    if not match:
+        return 0
+    hours, minutes, seconds = (
+        int(part or 0) for part in match.groups()
+    )
+    return hours * 3600 + minutes * 60 + seconds
+
+def main():
+    items = []
+    page_token = None
+
+    # プレイリスト内の動画を最大50本取得
+    while len(items) < 50:
+        params = {
+            "part": "snippet,contentDetails",
+            "playlistId": PLAYLIST_ID,
+            "maxResults": min(50, 50 - len(items)),
+        }
+        if page_token:
+            params["pageToken"] = page_token
+
+        data = api_get("playlistItems", params)
+        items.extend(data.get("items", []))
+        page_token = data.get("nextPageToken")
+
+        if not page_token:
+            break
+
+    candidates = []
+
+    for item in items:
+        snippet = item.get("snippet", {})
+        details = item.get("contentDetails", {})
+        video_id = details.get("videoId")
+
+        if not video_id or video_id in EXCLUDED_IDS:
+            continue
+
+        title = snippet.get("title", "")
+        published = details.get(
+            "videoPublishedAt",
+            snippet.get("publishedAt", "")
+        )
+
+        # タイトルにショートを示す語句がある動画を除外
+        if re.search(
+            r"#shorts?\b|ショート",
+            title,
+            re.IGNORECASE
+        ):
+            continue
+
+        candidates.append({
+            "id": video_id,
+            "title": title,
+            "url": f"https://www.youtube.com/watch?v={video_id}",
+            "thumbnail": (
+                f"https://i.ytimg.com/vi/{video_id}/hqdefault.jpg"
+            ),
+            "published": published,
+        })
+
+    # 再生時間を調べる
+    full_videos = []
+
+    for start in range(0, len(candidates), 50):
+        batch = candidates[start:start + 50]
+        ids = ",".join(video["id"] for video in batch)
+
+        data = api_get("videos", {
+            "part": "contentDetails,status",
+            "id": ids,
+        })
+
+        details_by_id = {
+            video["id"]: video
+            for video in data.get("items", [])
+        }
+
+        for video in batch:
+            details = details_by_id.get(video["id"])
+            if not details:
+                continue
+
+            # 非公開・削除済みなどを除外
+            if details.get("status", {}).get("privacyStatus") != "public":
+                continue
+
+            duration = parse_duration(
+                details.get("contentDetails", {}).get("duration", "")
+            )
+
+            # 3分以下はショートの可能性があるため除外
+            # 必要なら後から条件を調整できるよ
+            if duration <= 180:
+                continue
+
+            full_videos.append(video)
+
+    full_videos.sort(
+        key=lambda video: video["published"],
+        reverse=True
+    )
+
+    result = full_videos[:3]
+
+    with open(OUTPUT_FILE, "w", encoding="utf-8") as file:
+        json.dump(result, file, ensure_ascii=False, indent=2)
+
+    print(f"videos.json を更新: {len(result)}本")
+
+    if len(result) < 3:
+        print(
+            "注意: 条件に合う動画が3本未満です。"
+            "プレイリストと除外条件を確認してください。"
+        )
+
+if __name__ == "__main__":
+    main()
