@@ -60,7 +60,12 @@ h1{font-size:clamp(3.7rem,10vw,8.5rem);font-weight:500;line-height:.95;letter-sp
 .sig{width:min(28vw,310px);aspect-ratio:1;border:1px solid rgba(208,35,68,.55);border-radius:50%;display:grid;place-items:center;position:relative;transform:rotate(-12deg)}
 .sig:before,.sig:after{content:"";position:absolute;inset:12%;border:1px solid rgba(208,35,68,.35);border-radius:48% 52% 43% 57%}
 .sig:after{inset:25%;transform:rotate(55deg);border-radius:50% 35% 55% 40%}
-.sig b{font-family:'Cormorant Garamond',serif;font-size:clamp(4rem,10vw,8rem);font-weight:400;color:#d72a4c;text-shadow:0 0 45px rgba(215,42,76,.24)}
+.sig img{
+  width:75%;
+  height:75%;
+  object-fit:contain;
+  transform:rotate(12deg);
+}
 .side-note{position:absolute;right:0;bottom:2%;writing-mode:vertical-rl;letter-spacing:.25em;font-size:.63rem;color:#9d747d}
 
 section{padding:110px 6vw}
@@ -326,11 +331,12 @@ footer{padding:28px 6vw;border-top:1px solid var(--line);display:flex;justify-co
   <a class="btn primary" href="https://www.tunecore.co.jp/artists/Kodai-Kito" target="_blank" rel="noopener">MUSIC を聴く ↗</a>
 </div>
 
-    </div>
     <div class="hero-mark reveal" aria-label="Kitokodai emblem">
-      <div class="sig"><b>K.</b></div>
-      <div class="side-note">DARKNESS / POP / STORY</div>
-    </div>
+  <div class="sig">
+    <img src="kitoko-logo.jpg" alt="きとこ ロゴ">
+  </div>
+  <div class="side-note">DARKNESS / POP / STORY</div>
+</div>
   </div>
 </section>
 
