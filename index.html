@@ -407,6 +407,14 @@ footer{padding:28px 6vw;border-top:1px solid var(--line);display:flex;justify-co
     </div>
 
 
+    <div class="works-more reveal">
+      <p>ALBUMS / SINGLES / MUSIC VIDEOS</p>
+      <a href="works.html" class="works-more-link">
+        <span>すべての音楽作品を見る</span>
+        <span class="works-arrow">↗</span>
+      </a>
+    </div>
+
 </section>
 
 <section id="about">
@@ -540,6 +548,59 @@ fetch("./videos.json")
   .catch(error=>{
     console.error("YouTube動画の読み込みエラー:",error);
   });
+
+.works-more{
+  margin-top:42px;
+  padding:30px 24px;
+  border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+}
+
+.works-more p{
+  margin:0;
+  color:var(--muted);
+  font-size:.65rem;
+  letter-spacing:.16em;
+}
+
+.works-more-link{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:28px;
+  color:var(--cream);
+  font-size:.85rem;
+  letter-spacing:.1em;
+  transition:color .2s;
+}
+
+.works-arrow{
+  color:var(--red2);
+  font-size:1.4rem;
+  transition:transform .2s;
+}
+
+.works-more-link:hover{
+  color:var(--red2);
+}
+
+.works-more-link:hover .works-arrow{
+  transform:translate(4px,-4px);
+}
+
+@media(max-width:760px){
+  .works-more{
+    align-items:flex-start;
+    flex-direction:column;
+    gap:12px;
+    padding:24px 4px;
+  }
+}
+
 </script>
 </body>
 </html>
