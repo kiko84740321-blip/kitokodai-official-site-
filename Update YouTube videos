@@ -1,113 +1,116 @@
+
 name: Update YouTube videos
 
 on:
   schedule:
-    - cron: "17 * * * *"
+    - cron: "17 */6 * * *"
   workflow_dispatch:
 
 permissions:
   contents: write
 
+concurrency:
+  group: update-youtube-videos
+  cancel-in-progress: false
+
 jobs:
   update:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
 
-      - name: Fetch latest original MVs
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Fetch playlist videos
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          YOUTUBE_PLAYLIST_ID: PLpSvmeL1f95wgDv-wDC9G1w_axX6ab3f4
         run: |
           python - <<'PY'
           import json
+          import os
+          import urllib.parse
           import urllib.request
-          import xml.etree.ElementTree as ET
 
-          playlist_id = "PLpSvmeL1f95wgDv-wDC9G1w_axX6ab3f4"
-          url = (
-              "https://www.youtube.com/feeds/videos.xml"
-              f"?playlist_id={playlist_id}"
-          )
-
-          request = urllib.request.Request(
-              url,
-              headers={"User-Agent": "Mozilla/5.0"}
-          )
-
-          with urllib.request.urlopen(request, timeout=30) as response:
-              root = ET.fromstring(response.read())
-
-          ns = {
-              "atom": "http://www.w3.org/2005/Atom",
-              "yt": "http://www.youtube.com/xml/schemas/2015",
-              "media": "http://search.yahoo.com/mrss/",
-          }
+          key = os.environ["YOUTUBE_API_KEY"]
+          playlist_id = os.environ["YOUTUBE_PLAYLIST_ID"]
 
           videos = []
+          page_token = None
 
-          for entry in root.findall("atom:entry", ns):
-              video_id = entry.findtext(
-                  "yt:videoId", namespaces=ns
-              )
-              title = entry.findtext(
-                  "atom:title", namespaces=ns
-              )
-              published = entry.findtext(
-                  "atom:published", namespaces=ns
+          for _ in range(2):
+              params = {
+                  "part": "snippet,contentDetails",
+                  "playlistId": playlist_id,
+                  "maxResults": 50,
+                  "key": key
+              }
+              if page_token:
+                  params["pageToken"] = page_token
+
+              url = (
+                  "https://www.googleapis.com/youtube/v3/playlistItems?"
+                  + urllib.parse.urlencode(params)
               )
 
-              thumb = entry.find(
-                  "media:group/media:thumbnail", ns
-              )
+              with urllib.request.urlopen(url, timeout=30) as response:
+                  data = json.load(response)
 
-              if video_id and title:
+              for item in data.get("items", []):
+                  snippet = item["snippet"]
+                  video_id = item["contentDetails"].get("videoId")
+                  if not video_id:
+                      continue
+
+                  thumbs = snippet.get("thumbnails", {})
+                  thumbnail = (
+                      thumbs.get("maxres")
+                      or thumbs.get("standard")
+                      or thumbs.get("high")
+                      or thumbs.get("medium")
+                      or thumbs.get("default")
+                      or {}
+                  ).get(
+                      "url",
+                      f"https://i.ytimg.com/vi/{video_id}/hqdefault.jpg"
+                  )
+
                   videos.append({
                       "id": video_id,
-                      "title": title,
-                      "url": (
-                          "https://www.youtube.com/watch?v="
-                          + video_id
-                      ),
-                      "thumbnail": (
-                          thumb.get("url")
-                          if thumb is not None
-                          else (
-                              "https://i.ytimg.com/vi/"
-                              + video_id
-                              + "/hqdefault.jpg"
-                          )
-                      ),
-                      "published": published or "",
+                      "title": snippet["title"],
+                      "url": f"https://www.youtube.com/watch?v={video_id}",
+                      "thumbnail": thumbnail,
+                      "published": item["contentDetails"].get(
+                          "videoPublishedAt",
+                          snippet.get("publishedAt", "")
+                      )
                   })
 
+              page_token = data.get("nextPageToken")
+              if not page_token:
+                  break
+
           videos.sort(
-              key=lambda video: video["published"],
+              key=lambda v: v["published"],
               reverse=True
           )
 
-          videos = videos[:3]
-
-          if not videos:
-              raise SystemExit(
-                  "動画が取得できなかったため、更新を中止しました。"
-              )
-
-          with open(
-              "videos.json", "w", encoding="utf-8"
-          ) as f:
-              json.dump(
-                  videos, f, ensure_ascii=False, indent=2
-              )
+          with open("/tmp/videos.json", "w", encoding="utf-8") as f:
+              json.dump(videos[:10], f, ensure_ascii=False, indent=2)
               f.write("\n")
 
-          print(f"{len(videos)}件の動画を保存しました。")
+          print(f"{len(videos[:10])}本の動画を取得しました")
           PY
 
-     
-      - name: Commit updated videos.json
+      - name: Save latest videos
         run: |
+          git fetch origin main
+          git reset --hard origin/main
+
+          cp /tmp/videos.json videos.json
+
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          git pull --rebase origin main
 
           git add videos.json
 
