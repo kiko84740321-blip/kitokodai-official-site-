@@ -522,13 +522,65 @@ const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{
 document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));  
   
  
+
 const youtubeGrid = document.getElementById("youtube-grid");
 
-// Google Cloudで取得したYouTube Data APIキーを入れる
-const API_KEY = AIzaSyAHrLbpuxvp6GzCmFS5me6mxqu_IVXcH3M;
-
-// チャンネルの最新動画3本を取得
 async function loadLatestVideos() {
+  try {
+    const response = await fetch("./videos.json");
+
+    if (!response.ok) {
+      throw new Error("videos.jsonを読み込めません");
+    }
+
+    const videos = await response.json();
+    youtubeGrid.innerHTML = "";
+
+    videos.slice(0, 3).forEach(video => {
+      const article = document.createElement("article");
+      article.className = "track";
+
+      const link = document.createElement("a");
+      link.href = video.url;
+      link.target = "_blank";
+      link.rel = "noopener";
+
+      const cover = document.createElement("div");
+      cover.className = "cover auto-cover";
+
+      const img = document.createElement("img");
+      img.src = video.thumbnail;
+      img.alt = "";
+
+      const body = document.createElement("div");
+      body.className = "track-body";
+
+      const type = document.createElement("div");
+      type.className = "track-type";
+      type.textContent = "YOUTUBE / LATEST VIDEO";
+
+      const title = document.createElement("h3");
+      title.textContent = video.title;
+
+      const label = document.createElement("span");
+      label.className = "text-link";
+      label.textContent = "WATCH VIDEO ↗";
+
+      cover.appendChild(img);
+      body.append(type, title, label);
+      link.append(cover, body);
+      article.appendChild(link);
+      youtubeGrid.appendChild(article);
+    });
+
+  } catch (error) {
+    console.error(error);
+    youtubeGrid.textContent = "動画を読み込めませんでした。";
+  }
+}
+
+loadLatestVideos();
+ {
   try {
     const channelRes = await fetch(
       `https://www.googleapis.com/youtube/v3/channels?part=contentDetails&forHandle=%40kitokodai&key=${API_KEY}`
