@@ -12,6 +12,7 @@ permissions:
 jobs:
   update-videos:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -21,14 +22,16 @@ jobs:
         with:
           python-version: "3.x"
 
-      - name: Update videos.json
-        env:
-          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
-                run: |
+      - name: Check files
+        run: |
           pwd
           ls -la
           ls -la scripts
-          python scripts/update_videos.py
+
+      - name: Update videos.json
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        run: python scripts/update_videos.py
 
       - name: Commit updated videos.json
         run: |
