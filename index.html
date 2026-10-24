@@ -245,8 +245,16 @@ h2{font-size:clamp(1.7rem,4vw,3rem);font-weight:500;letter-spacing:.1em;margin:6
 .contact p{color:var(--muted);font-size:.82rem;margin:18px auto 28px}  
 footer{padding:28px 6vw;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;color:#87797d;font-size:.65rem;letter-spacing:.1em}  
   
-.reveal{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease}  
-.reveal.visible{opacity:1;transform:none}  
+ .reveal {
+  opacity: 1;
+  transform: none;
+  transition: opacity .7s ease, transform .7s ease;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: none;
+}
   
 /* スマホ表示 */  
 @media(max-width:760px){  
