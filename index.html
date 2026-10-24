@@ -496,33 +496,47 @@ footer{padding:28px 6vw;border-top:1px solid var(--line);display:flex;justify-co
 </main>  <footer>  
   <span>© <span id="year"></span> KITOKODAI</span>  
   <span>MADE OF MUSIC, DARK & POPS</span>  
-</footer>  <script>  
-const menu=document.getElementById('menu');  
-const nav=document.getElementById('navlinks');  
-  
-menu.addEventListener('click',()=>{  
-  const open=nav.classList.toggle('open');  
-  menu.setAttribute('aria-expanded',String(open));  
-});  
-  
-nav.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{  
-  nav.classList.remove('open');  
-  menu.setAttribute('aria-expanded','false');  
-}));  
-  
-document.getElementById('year').textContent=new Date().getFullYear();  
-  
-const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{  
-  if(entry.isIntersecting){  
-    entry.target.classList.add('visible');  
-    observer.unobserve(entry.target);  
-  }  
-}),{threshold:.12});  
-  
-document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));  
-  
- 
+</footer>  
+<script>
+const menu = document.getElementById("menu");
+const nav = document.getElementById("navlinks");
 
+menu.addEventListener("click", () => {
+  const open = nav.classList.toggle("open");
+  menu.setAttribute("aria-expanded", String(open));
+});
+
+nav.querySelectorAll("a").forEach(a => {
+  a.addEventListener("click", () => {
+    nav.classList.remove("open");
+    menu.setAttribute("aria-expanded", "false");
+  });
+});
+
+document.getElementById("year").textContent =
+  new Date().getFullYear();
+
+// スクロール時の表示アニメーション
+if ("IntersectionObserver" in window) {
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("visible");
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll(".reveal").forEach(el => {
+    observer.observe(el);
+  });
+} else {
+  document.querySelectorAll(".reveal").forEach(el => {
+    el.classList.add("visible");
+  });
+}
+
+// YouTube最新動画3本を読み込む
 const youtubeGrid = document.getElementById("youtube-grid");
 
 async function loadLatestVideos() {
@@ -551,6 +565,7 @@ async function loadLatestVideos() {
       const img = document.createElement("img");
       img.src = video.thumbnail;
       img.alt = "";
+      img.loading = "lazy";
 
       const body = document.createElement("div");
       body.className = "track-body";
@@ -573,86 +588,18 @@ async function loadLatestVideos() {
       youtubeGrid.appendChild(article);
     });
 
-  } catch (error) {
-    console.error(error);
-    youtubeGrid.textContent = "動画を読み込めませんでした。";
-  }
-}
-
-loadLatestVideos();
- {
-  try {
-    const channelRes = await fetch(
-      `https://www.googleapis.com/youtube/v3/channels?part=contentDetails&forHandle=%40kitokodai&key=${API_KEY}`
-    );
-
-    if (!channelRes.ok) throw new Error("チャンネル取得エラー");
-
-    const channelData = await channelRes.json();
-    const uploadsId =
-      channelData.items?.[0]?.contentDetails?.relatedPlaylists?.uploads;
-
-    if (!uploadsId) throw new Error("チャンネルが見つかりません");
-
-    const videosRes = await fetch(
-      `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${uploadsId}&maxResults=3&key=${API_KEY}`
-    );
-
-    if (!videosRes.ok) throw new Error("動画取得エラー");
-
-    const data = await videosRes.json();
-    youtubeGrid.innerHTML = "";
-
-    data.items.forEach(item => {
-      const videoId = item.snippet.resourceId.videoId;
-      const title = item.snippet.title;
-      const thumbnail =
-        item.snippet.thumbnails.high?.url ||
-        item.snippet.thumbnails.medium?.url;
-
-      const article = document.createElement("article");
-      article.className = "track";
-
-      const link = document.createElement("a");
-      link.href = `https://www.youtube.com/watch?v=${videoId}`;
-      link.target = "_blank";
-      link.rel = "noopener";
-
-      const cover = document.createElement("div");
-      cover.className = "cover auto-cover";
-
-      const img = document.createElement("img");
-      img.src = thumbnail;
-      img.alt = "";
-      cover.appendChild(img);
-
-      const body = document.createElement("div");
-      body.className = "track-body";
-
-      const type = document.createElement("div");
-      type.className = "track-type";
-      type.textContent = "YOUTUBE / LATEST VIDEO";
-
-      const heading = document.createElement("h3");
-      heading.textContent = title;
-
-      const label = document.createElement("span");
-      label.className = "text-link";
-      label.textContent = "WATCH VIDEO ↗";
-
-      body.append(type, heading, label);
-      link.append(cover, body);
-      article.appendChild(link);
-      youtubeGrid.appendChild(article);
-    });
+    if (videos.length === 0) {
+      youtubeGrid.textContent = "動画がまだ登録されていません。";
+    }
   } catch (error) {
     console.error(error);
     youtubeGrid.textContent =
-      "動画を読み込めませんでした。APIキーと設定を確認してください。";
+      "動画を読み込めませんでした。";
   }
 }
 
 loadLatestVideos();
+</script>
 
-</script>  </body>  
+       </body>  
 </html>
