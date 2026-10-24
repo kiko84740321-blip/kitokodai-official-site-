@@ -562,7 +562,72 @@ async function loadLatestVideos() {
       "動画を読み込めませんでした。";
   }
 }
+const releaseGrid = document.getElementById("release-grid");
 
+async function loadReleases() {
+try {
+const response = await fetch("./releases.json");
+if (!response.ok) throw new Error("releases.jsonを読み込めません");
+
+const data = await response.json();
+releaseGrid.innerHTML = "";
+
+const items = [
+  ...(data.albums || []).map(item => ({...item, type:"LATEST ALBUM", label:"ALBUM"})),
+  ...(data.singles || []).map(item => ({...item, type:"LATEST SINGLE", label:"SINGLE"}))
+];
+
+items.forEach(item => {
+  const article = document.createElement("article");
+  article.className = "track";
+
+  const link = document.createElement("a");
+  link.href = item.url;
+  link.target = "_blank";
+  link.rel = "noopener";
+
+  const cover = document.createElement("div");
+  cover.className = "cover auto-cover";
+
+  if (item.thumbnail) {
+    const img = document.createElement("img");
+    img.src = item.thumbnail;
+    img.alt = "";
+    img.loading = "lazy";
+    cover.appendChild(img);
+  } else {
+    const fallback = document.createElement("span");
+    fallback.textContent = item.label;
+    cover.appendChild(fallback);
+  }
+
+  const body = document.createElement("div");
+  body.className = "track-body";
+
+  const type = document.createElement("div");
+  type.className = "track-type";
+  type.textContent = item.type;
+
+  const title = document.createElement("h3");
+  title.textContent = item.title;
+
+  const button = document.createElement("span");
+  button.className = "text-link";
+  button.textContent = "LISTEN ↗";
+
+  body.append(type, title, button);
+  link.append(cover, body);
+  article.appendChild(link);
+  releaseGrid.appendChild(article);
+});
+
+} catch (error) {
+console.error(error);
+releaseGrid.textContent = "リリース情報を読み込めませんでした。";
+}
+}
+
+loadReleases();
 loadLatestVideos();
 </script>
 
